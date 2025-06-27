@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <title>小小的禮物</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #000;
+      color: white;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .login-container {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      z-index: 10;
+    }
+
+    input[type="password"] {
+      padding: 10px;
+      font-size: 18px;
+      border-radius: 8px;
+      border: none;
+      margin-right: 10px;
+    }
+
+    .check-btn {
+      padding: 10px 20px;
+      font-size: 18px;
+      background: crimson;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .check-btn:hover { background: deeppink; }
+
+    .error {
+      margin-top: 10px;
+      color: orange;
+      font-size: 14px;
+      height: 1em;
+    }
+
+    .menu-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 30px;
+      height: 100vh;
+      width: 100%;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 1s ease;
+    }
+
+    .menu-container.visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .menu-item {
+      position: relative;
+      width: 18vw;
+      height: 60vh;
+      overflow: hidden;
+      border-radius: 20px;
+      filter: grayscale(1);
+      transition: all 0.4s ease;
+      cursor: pointer;
+    }
+
+    .menu-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.3s ease;
+    }
+
+    .menu-item:hover {
+      width: 30vw;
+      filter: grayscale(0);
+    }
+
+    .menu-item:hover img {
+      transform: scale(1.05);
+    }
+
+    .title {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(0,0,0,0.6);
+      color: cyan;
+      padding: 10px 20px;
+      border-radius: 10px;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      font-weight: bold;
+      font-size: 16px;
+      pointer-events: none;
+    }
+
+    .menu-item:hover .title {
+      opacity: 1;
+    }
+
+    #gallery {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: #000;
+      display: none;
+      overflow: hidden;
+    }
+
+    .carousel {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      perspective: 1500px;
+    }
+
+    .card {
+      position: absolute;
+      width: 300px;
+      height: 400px;
+      transform-style: preserve-3d;
+      transition: transform 0.8s ease;
+    }
+
+    .inner {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 0.8s ease;
+    }
+
+    .card.flipped .inner {
+      transform: rotateY(180deg);
+    }
+
+    .side {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      backface-visibility: hidden;
+      border-radius: 16px;
+    }
+
+    .front {
+      background-size: cover;
+      background-position: center;
+    }
+
+    .back {
+      transform: rotateY(180deg);
+      background: #111;
+      color: cyan;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 18px;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .nav-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 32px;
+      background: rgba(0,0,0,0.5);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      cursor: pointer;
+      z-index: 10;
+    }
+
+    .nav-btn.left { left: 30px; }
+    .nav-btn.right { right: 30px; }
+
+    .back-btn {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      font-size: 18px;
+      background: #222;
+      color: white;
+      border: none;
+      padding: 10px 16px;
+      cursor: pointer;
+      z-index: 10;
+      border-radius: 8px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 密碼區 -->
+  <div class="login-container" id="login">
+    <input type="password" id="password" placeholder="請輸入密碼">
+    <button class="check-btn" onclick="checkPassword()">確認</button>
+    <div class="error" id="errorMsg"></div>
+  </div>
+
+  <!-- 主選單 -->
+  <div class="menu-container" id="menu">
+    <div class="menu-item" onclick="enterGallery(0)"><img src="PHOTO/yelan1.jpg"><div class="title">宜蘭</div></div>
+    <div class="menu-item" onclick="enterGallery(1)"><img src="PHOTO/tao1.jpg"><div class="title">美術館</div></div>
+    <div class="menu-item" onclick="enterGallery(2)"><img src="PHOTO/newyear1.jpg"><div class="title">跨年</div></div>
+    <div class="menu-item" onclick="enterGallery(3)"><img src="PHOTO/na1.jpg"><div class="title">台南</div></div>
+    <div class="menu-item" onclick="enterGallery(4)"><img src="PHOTO/jong1.jpg"><div class="title">台中</div></div>
+  </div>
+
+  <!-- 卡片展示 -->
+  <div id="gallery">
+    <button class="back-btn" onclick="backToMenu()">← 返回</button>
+    <div class="carousel" id="carousel"></div>
+    <button class="nav-btn left" onclick="prevCard()">←</button>
+    <button class="nav-btn right" onclick="nextCard()">→</button>
+  </div>
+
+  <script>
+    const CORRECT_PASSWORD = "ILOVEYOU";
+    const imageGroups = [
+      [ {src:'PHOTO/y1.jpg', text:'這是我第一次跟你去海邊，天氣很好很熱還看的到龜山島呢'}, {src:'PHOTO/y2.jpg', text:'這是我們第二次去積木博物館，第一次去是兩天前，吃飯前還遇到了你的大舅舅，謝謝妳願意陪我去我喜歡的地方'}, {src:'PHOTO/y3.jpg', text:'這裡是張美阿媽農場，那裡好多可愛的動物但妳依然是最可愛的，這張照片我印象很深，那時候還沒再一起但店員說要上傳照片，妳主動的說要上傳到FB我真的超級感動的!'}, {src:'PHOTO/y4.jpg', text:'還記得這片天空嗎，當時晚上12點妳毫不猶豫地答應我陪我來看夜景，結果到了以後花不到五分鐘就離開了，原因是因為我怕得要命哈哈哈!雖然沒有看到滿天的星星，但這一刻彷彿比登上太空還開心'}, {src:'PHOTO/y5.jpg', text:'這是我們第一次一起住的地方，搭配在地的生乳捲真的是幸福中的幸福。謝謝妳願意陪我出來這一趟，帶給我超級多的回憶，現在想到那時候的我們嘴角還會上揚呢，太開心了!'} ],
+      [ {src:'PHOTO/t1.jpg', text:'還記得嗎，這裡是跟阿薰他們出遠門玩的一天，那天大家都玩的很開心，回來彼此也變得更好的朋友'}, {src:'PHOTO/t3.jpg', text:'有一句話是這麼說的，待在怎麼樣的環境，會變成那個環境的樣子。妳好美謝謝妳讓我能參與妳的美'}, {src:'PHOTO/t2.jpg', text:'當然除了美以外，謝謝妳陪我去做白癡的事情，過得非常自在我好開心'}, {src:'PHOTO/t4.jpg', text:'結束後我們去了大稻埕，那一晚很美還看到了夕陽還吃了很不好吃的薯條，但那又如何有妳有我一切都很完美'}, {src:'PHOTO/t5.jpg', text:'這是我正式公開你的那天，雖然是妳發的，但從那時候起我就決定告訴全世界妳是我的，我會好好的照顧妳陪妳到永遠'} ],
+      [ {src:'PHOTO/new5.jpg', text:'跨年那天過得非常精彩，可惜我沒有什麼照片，借放幾張桃園的吧，只後再補齊'}, {src:'PHOTO/new3.jpg', text:'這是我們第一次去水族館，裡面很美，很多魚在游泳。在那邊我看上了一條於是把他抓走帶回家了'}, {src:'PHOTO/new4.jpg', text:'這是我人生最感動的時刻，以前聽到別人說不知道送什麼的話就送花吧，但我不知道會這麼開心。謝謝妳!'}, {src:'PHOTO/new1.jpg', text:'我們過的第一場跨年，竟然是看完妳表演後然後看煙火，真的太太太特別了，未來我會持續當妳的粉絲的，請妳也要持續表演下去啊!'}, {src:'PHOTO/new2.jpg', text:'這天我們吵得很兇，還以為遇不到妳了，謝謝妳又給了我機會。這次的爭吵讓我們下半年過的更像自己，過的更了解對方的想法。我想這天不只是單純的跨年，而是我們重新的開始'} ],
+      [ {src:'PHOTO/n5.jpg', text:'第一站是順德牛肉湯，雖然這間不是有名的牛肉湯名店。但能瘋狂的當天殺來台南喝這一碗真的太爽了'}, {src:'PHOTO/n3.jpg', text:'再來到了頑皮世界，我們繼續發神經的逛了很多園區，還特地去看了公雞'}, {src:'PHOTO/n1.jpg', text:'到了遊樂區，我們點了鬆餅因為要等比較久，我們去排隊玩碰碰車，妳說要把我撞飛，解果真的飛了，因為我贏了被妳打飛了'}, {src:'PHOTO/n4.jpg', text:'後來到了嘉義圤子吃美味雞肉飯，價錢真的是誇張的低，後來去買潤餅結果太多人沒有派對買到。沒關係，下次報酬吧!!'}, {src:'PHOTO/n2.jpg', text:'最後是送妳回雲林老家後拍的照片，雖然這一趟下來真的讓我屁股痠到爛掉了。但這一刻，這樣的回憶，我還有多少時間願意去做呢。謝謝妳在我還願意瘋的日子裡陪伴我一同參與。'} ],
+      [ {src:'PHOTO/j1.jpg', text:'台中的回憶太多了，不管是好是壞，我覺得只要是跟妳度過的一切都值得!'}, {src:'PHOTO/j2.jpg', text:'還記得那時候妳跟大家都還不熟的時候，妳主動詢問我是否能跟我們去武武嶺這件事嗎，要不是沒有那時候妳的主動也不會有今天的我們了。謝謝妳來到我的身邊'}, {src:'PHOTO/j3.jpg', text:'這是公園眼科，對當地人的我來說還真的不敢去嘗試這個新事物，另外我們也吃了超級好吃的雞肉飯。我願意為了妳繼續去嘗試新事物，我與你一起!度過未知的未來'}, {src:'PHOTO/j4.jpg', text:'那天有可愛的酪梨與阿科，我雖然時常讓妳生氣，讓妳覺得我不愛妳了。不是的我比妳想像的愛上妳很多很多。謝謝妳不斷的給我機會，也願意不斷的回到我身邊與我和好，讓妳就算說了要分手的話我還是非常放心的覺得妳不會就這樣離開。'}, {src:'PHOTO/j5.jpg', text:'這是中興大學的足球場，不單單是我們拿滿貫獎的地方。對我來說是一個成功的地方，成功的帶我最心愛的人回家了，歡迎妳的到來!!'} ],
+    ];
+
+    let current = 0;
+    let images = [];
+
+    function checkPassword() {
+      const input = document.getElementById("password").value;
+      const errorMsg = document.getElementById("errorMsg");
+      if (input === CORRECT_PASSWORD) {
+        document.getElementById("login").style.display = "none";
+        document.getElementById("menu").classList.add("visible");
+      } else {
+        errorMsg.textContent = "密碼錯誤，請再試一次。";
+      }
+    }
+
+    function enterGallery(index) {
+      images = imageGroups[index];
+      current = 0;
+      document.getElementById("menu").style.display = "none";
+      document.getElementById("gallery").style.display = "block";
+      render();
+    }
+
+    function backToMenu() {
+      document.getElementById("gallery").style.display = "none";
+      document.getElementById("menu").style.display = "flex";
+    }
+
+    function render() {
+      const carousel = document.getElementById("carousel");
+      carousel.innerHTML = "";
+      images.forEach((img, i) => {
+        const card = document.createElement("div");
+        card.className = "card";
+        const offset = i - current;
+        const angle = offset * 30;
+        const scale = 1 - Math.abs(offset) * 0.1;
+        const z = -Math.abs(offset) * 200;
+        const x = offset * 300;
+        card.style.transform = `translate(-50%, -50%) translateX(${x}px) translateZ(${z}px) rotateY(${angle}deg) scale(${scale})`;
+        card.style.zIndex = 5 - Math.abs(offset);
+        card.innerHTML = `
+          <div class="inner">
+            <div class="side front" style="background-image:url('${img.src}')"></div>
+            <div class="side back">${img.text}</div>
+          </div>
+        `;
+        card.addEventListener("click", () => {
+          const flipped = card.classList.contains("flipped");
+          document.querySelectorAll(".card").forEach(c => c.classList.remove("flipped"));
+          if (!flipped) card.classList.add("flipped");
+        });
+        carousel.appendChild(card);
+      });
+    }
+
+    function nextCard() {
+      current = (current + 1) % images.length;
+      render();
+    }
+
+    function prevCard() {
+      current = (current - 1 + images.length) % images.length;
+      render();
+    }
+
+    document.addEventListener("keydown", e => {
+      if (e.key === "ArrowRight") nextCard();
+      if (e.key === "ArrowLeft") prevCard();
+    });
+  </script>
+</body>
+</html>
